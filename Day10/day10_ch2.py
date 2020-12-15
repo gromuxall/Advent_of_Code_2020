@@ -11,22 +11,15 @@ def main():
     lines.insert(0, 0)
     lines.append(lines[-1] + 3)
 
-    threes = 0
-    ones = 0
+    nodes = {line: 0 for line in lines}
+    nodes[0] = 1
+
+    for i, num in enumerate(lines):
+        for nxt in lines[i+1:i+4]:
+            if nxt - lines[i] < 4:
+                nodes[nxt] += nodes[num]
     
-    for line in lines:
-        print(line)
-
-    for i in range(1, len(lines)):
-        diff = lines[i] - lines[i-1]
-
-        if diff == 3:
-            threes += 1
-        if diff == 1:
-            ones += 1
-
-    return ones * threes
-
+    return nodes[lines[-1]]
 
 # --------------------------------------------------------------------------- //
 if __name__ == "__main__":
