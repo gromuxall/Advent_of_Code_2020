@@ -11,7 +11,7 @@ class Matrix():
         self.occupied = 0
         self.mtx_A = rows
         self.mtx_B = [[] for i in range(len(self.mtx_A))]
-        self.neighbors = {(i, j): self.get_neighbors(i, j)
+        self.neighbors = {(i, j): self.get_neighbors_p2(i, j)
                           for i in range(len(self.mtx_A))
                           for j in range(len(self.mtx_A[0]))}
 
@@ -25,7 +25,7 @@ class Matrix():
         self.seat_swap()
         return self.occupied
 
-    def get_neighbors(self, row, col):
+    def get_neighbors_p1(self, row, col):
         '''Calculates and returns a list of neighbor positions
         for the passed-in coordinates of the origin matrix, not including
         out-of-bounds positions or positions where . is present'''
@@ -35,6 +35,27 @@ class Matrix():
                 0 <= j + col < len(self.mtx_A[0])       and
                 not (i + row == row and j + col == col) and
                 not self.mtx_A[i + row][j + col] == '.']
+
+    def get_neighbors_p2(self, row, col):
+        '''Calculates and returns a list of neighbor positions
+        for the passed-in coordinates of the origin matrix, not including
+        out-of-bounds positions and searches for next nearest neighbor
+        for positions where '.' is present'''
+
+        ret = []
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                _row = i + row
+                _col = j + col
+                if not (_row == row and _col == col):
+                    while 0 <= _row < len(self.mtx_A) and 0 <= _col < len(self.mtx_A[0]):
+                        cell = self.mtx_A[_row][_col]
+                        if not cell == '.':
+                            ret.append((_row, _col))
+                            break
+                        _row += i
+                        _col += j
+        return ret
 
     def seat_swap(self):
         '''Swaps matrix cell following these rules:
@@ -58,7 +79,7 @@ class Matrix():
                         self.mtx_B[idxs[0]].append(cell)
                 elif cell == '#':
                     if len(list(filter(
-                            lambda x: self.mtx_A[x[0]][x[1]] == '#', nbrs))) >= 4:
+                            lambda x: self.mtx_A[x[0]][x[1]] == '#', nbrs))) >= 5:
                         self.mtx_B[idxs[0]].append('L')
                     else:
                         self.mtx_B[idxs[0]].append(cell)
@@ -75,6 +96,7 @@ class Matrix():
         occupied seats if both matrices are the same, swapping the matrices
         and running again if not
         '''
+        print(self)
         if self.mtx_B == self.mtx_A:
             self.occupied = sum([row.count('#') for row in self.mtx_A])
         else:
